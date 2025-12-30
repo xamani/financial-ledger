@@ -9,6 +9,7 @@ use App\Http\Requests\FinancialReportIndexRequest;
 use App\Models\Transaction;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class FinancialReportController extends Controller
 {
@@ -119,9 +120,18 @@ class FinancialReportController extends Controller
         $end = Carbon::parse($data['end_date'])->endOfDay();
         $granularity = (string) ($data['granularity'] ?? 'day');
 
+        $driver = DB::connection()->getDriverName();
+
         $periodExpression = match ($granularity) {
-            'month' => "DATE_FORMAT(created_at, '%Y-%m-01')",
-            default => 'DATE(created_at)',
+            'month' => match ($driver) {
+                'sqlite' => "strftime('%Y-%m-01', created_at)",
+                'pgsql' => "to_char(date_trunc('month', created_at), 'YYYY-MM-01')",
+                default => "DATE_FORMAT(created_at, '%Y-%m-01')",
+            },
+            default => match ($driver) {
+                'pgsql' => 'CAST(created_at AS DATE)',
+                default => 'DATE(created_at)',
+            },
         };
 
         $rows = Transaction::query()
