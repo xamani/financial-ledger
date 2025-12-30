@@ -36,5 +36,16 @@ class Wallet extends Model
         return $this->hasMany(Transaction::class);
     }
 
+    public function scopeSystem(Builder $query, string $slug): Builder
+    {
+        return $query
+            ->whereNull('user_id')
+            ->where('slug', $slug);
+    }
+
+    public function isSystem(): bool
+    {
+        return $this->user_id === null && $this->slug !== null;
+    }
 }
 
