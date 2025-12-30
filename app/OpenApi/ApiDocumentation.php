@@ -30,6 +30,11 @@ namespace App\OpenApi;
  *     name="Transactions",
  *     description="Ledger transactions"
  * )
+ *
+ * @OA\Tag(
+ *     name="Wallets",
+ *     description="Wallet operations"
+ * )
  */
 final class ApiDocumentation
 {

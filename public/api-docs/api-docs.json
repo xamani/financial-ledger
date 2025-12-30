@@ -303,6 +303,51 @@
                     }
                 }
             }
+        },
+        "/api/wallets/withdraw": {
+            "post": {
+                "tags": [
+                    "Wallets"
+                ],
+                "summary": "Withdraw from a wallet (creates an OUT transaction and decrements balance)",
+                "operationId": "c578418ba6480b5273a41ba51d321a3e",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "wallet_id",
+                                    "amount"
+                                ],
+                                "properties": {
+                                    "wallet_id": {
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "amount": {
+                                        "type": "integer",
+                                        "example": 50000
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "example": "User withdrawal"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "422": {
+                        "description": "Validation/insufficient balance"
+                    }
+                }
+            }
         }
     },
     "tags": [
@@ -317,6 +362,10 @@
         {
             "name": "Transactions",
             "description": "Ledger transactions"
+        },
+        {
+            "name": "Wallets",
+            "description": "Wallet operations"
         }
     ]
 }
