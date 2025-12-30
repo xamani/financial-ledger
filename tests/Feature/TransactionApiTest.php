@@ -72,5 +72,13 @@ class TransactionApiTest extends TestCase
         $this->assertCount(1, $filtered->json('data'));
         $filtered->assertJsonPath('data.0.wallet_id', $walletB->id);
         $filtered->assertJsonPath('data.0.type', 'platform_commission');
+        $filtered->assertJsonPath('data.0.wallet.name', 'Commission Wallet');
+        $filtered->assertJsonPath('data.0.wallet.balance', '0');
+        $filtered->assertJsonMissingPath('data.0.wallet.id');
+        $filtered->assertJsonMissingPath('data.0.wallet.user_id');
+        $filtered->assertJsonMissingPath('data.0.wallet.slug');
+        $filtered->assertJsonMissingPath('data.0.wallet.is_system');
+
+        $filtered->assertJsonMissingPath('data.0.order');
     }
 }

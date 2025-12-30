@@ -6,6 +6,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\OrderCallbackRequest;
 use App\Http\Requests\StoreOrderRequest;
+use App\Http\Resources\OrderResource;
 use App\Models\Order;
 use App\Models\Transaction;
 use App\Models\Wallet;
@@ -45,9 +46,9 @@ class OrderController extends Controller
             'status' => 'pending',
         ]);
 
-        return response()->json([
-            'data' => $order,
-        ], 201);
+        return (new OrderResource($order))
+            ->response()
+            ->setStatusCode(201);
     }
 
     /**
@@ -118,7 +119,7 @@ class OrderController extends Controller
             if ($order->status === 'completed') {
                 return response()->json([
                     'message' => 'Order already completed.',
-                    'data' => $order,
+                    'data' => (new OrderResource($order))->resolve(),
                 ]);
             }
 
@@ -145,7 +146,7 @@ class OrderController extends Controller
 
             return response()->json([
                 'message' => 'Payment processed.',
-                'data' => $order->fresh(),
+                'data' => (new OrderResource($order->fresh()))->resolve(),
             ]);
         });
     }

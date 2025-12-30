@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers;
 
 use App\Http\Requests\TransactionIndexRequest;
+use App\Http\Resources\TransactionResource;
 use App\Models\Transaction;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Carbon;
@@ -32,7 +33,7 @@ class TransactionController extends Controller
         $data = $request->validated();
 
         $query = Transaction::query()
-            ->with(['wallet', 'order'])
+            ->with(['wallet'])
             ->orderByDesc('id');
 
         if (isset($data['wallet_id'])) {
@@ -60,14 +61,6 @@ class TransactionController extends Controller
         $perPage = (int) ($data['per_page'] ?? 25);
         $paginator = $query->paginate($perPage);
 
-        return response()->json([
-            'data' => $paginator->items(),
-            'meta' => [
-                'current_page' => $paginator->currentPage(),
-                'per_page' => $paginator->perPage(),
-                'total' => $paginator->total(),
-                'last_page' => $paginator->lastPage(),
-            ],
-        ]);
+        return TransactionResource::collection($paginator)->response();
     }
 }
