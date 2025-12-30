@@ -17,6 +17,26 @@ use Illuminate\Support\Facades\DB;
 class OrderController extends Controller
 {
     /**
+     * @OA\Get(
+     *     path="/api/orders/{order}",
+     *     tags={"Orders"},
+     *     summary="Show a single order",
+     *     @OA\Parameter(
+     *         name="order",
+     *         in="path",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(response=200, description="OK"),
+     *     @OA\Response(response=404, description="Not found")
+     * )
+     */
+    public function show(Order $order): JsonResponse
+    {
+        return (new OrderResource($order))->response();
+    }
+
+    /**
      * @OA\Post(
      *     path="/api/orders",
      *     tags={"Orders"},

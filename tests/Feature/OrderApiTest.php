@@ -15,6 +15,25 @@ class OrderApiTest extends TestCase
 {
     use RefreshDatabase;
 
+    public function test_show_returns_single_order(): void
+    {
+        $user = User::factory()->create();
+        $order = Order::query()->create([
+            'user_id' => $user->id,
+            'total_amount' => '1000',
+            'status' => 'pending',
+            'completed_at' => null,
+        ]);
+
+        $response = $this->getJson("/api/orders/{$order->id}");
+
+        $response->assertOk();
+        $response->assertJsonPath('data.id', $order->id);
+        $response->assertJsonPath('data.user_id', $user->id);
+        $response->assertJsonPath('data.total_amount', '1000');
+        $response->assertJsonPath('data.status', 'pending');
+    }
+
     public function test_store_creates_a_pending_order(): void
     {
         $user = User::factory()->create();
@@ -176,4 +195,3 @@ class OrderApiTest extends TestCase
         $this->assertSame(0, Transaction::query()->count());
     }
 }
-

@@ -14,6 +14,23 @@ class TransactionController extends Controller
 {
     /**
      * @OA\Get(
+     *     path="/api/transactions/{transaction}",
+     *     tags={"Transactions"},
+     *     summary="Show a single transaction",
+     *     @OA\Parameter(name="transaction", in="path", required=true, @OA\Schema(type="integer")),
+     *     @OA\Response(response=200, description="OK"),
+     *     @OA\Response(response=404, description="Not found")
+     * )
+     */
+    public function show(Transaction $transaction): JsonResponse
+    {
+        $transaction->load(['wallet']);
+
+        return (new TransactionResource($transaction))->response();
+    }
+
+    /**
+     * @OA\Get(
      *     path="/api/transactions",
      *     tags={"Transactions"},
      *     summary="List transactions (paginated)",

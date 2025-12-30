@@ -15,6 +15,35 @@ class TransactionApiTest extends TestCase
 {
     use RefreshDatabase;
 
+    public function test_show_returns_single_transaction_with_wallet(): void
+    {
+        $user = User::factory()->create();
+        $wallet = Wallet::query()->create([
+            'user_id' => $user->id,
+            'slug' => null,
+            'name' => 'User Wallet',
+            'balance' => '123',
+        ]);
+
+        $transaction = Transaction::query()->create([
+            'wallet_id' => $wallet->id,
+            'order_id' => null,
+            'type' => 'deposit',
+            'amount' => '10',
+            'flow' => 'in',
+            'description' => 'test',
+        ]);
+
+        $response = $this->getJson("/api/transactions/{$transaction->id}");
+
+        $response->assertOk();
+        $response->assertJsonPath('data.id', $transaction->id);
+        $response->assertJsonPath('data.wallet_id', $wallet->id);
+        $response->assertJsonPath('data.type', 'deposit');
+        $response->assertJsonPath('data.wallet.name', 'User Wallet');
+        $response->assertJsonPath('data.wallet.balance', '123');
+    }
+
     private function createTransaction(array $attributes, string $createdAt): Transaction
     {
         $transaction = Transaction::query()->create($attributes);
