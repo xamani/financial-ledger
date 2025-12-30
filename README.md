@@ -1,59 +1,163 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Financial Ledger (Laravel)
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+یک API نمونه برای پیاده‌سازی «دفترکل مالی (Ledger)» که روی سفارش‌ها (Orders)، کیف‌پول‌ها (Wallets) و تراکنش‌ها (Transactions) می‌نشیند و امکان گزارش‌گیری تجمیعی و نموداری از جریان‌های مالی را فراهم می‌کند.
 
-## About Laravel
+این پروژه شامل یک جریان پرداخت Mock هم هست: سفارش ساخته می‌شود، یک لینک پرداخت نمایشی برمی‌گردد، و با ارسال callback بانک (success/failed) تراکنش‌های دفترکل ایجاد می‌شوند.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## قابلیت‌ها
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+- ساخت سفارش `pending` و تکمیل پرداخت با callback (ایمن از نظر همزمانی با `lockForUpdate`)
+- ثبت دفترکل تراکنش‌ها با `flow` (ورودی/خروجی) و `type` (مثل `platform_commission`, `post_cost`, ...)
+- ساخت و به‌روزرسانی کیف‌پول‌های سیستمی (بر اساس `slug`) و کیف‌پول کاربر
+- برداشت از کیف‌پول (ثبت تراکنش `withdrawal` با `flow=out`)
+- گزارش تجمیعی بین بازه تاریخ و گزارش نموداری (day/month) به‌صورت سری زمانی
+- مستندات OpenAPI/Swagger با `darkaonline/l5-swagger`
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## پشتهٔ فنی
 
-## Learning Laravel
+- PHP `^8.2` + Laravel `^12`
+- دیتابیس: SQLite (پیش‌فرض در `.env.example`) یا MySQL (کانتینر در `docker-compose.yml`)
+- Vite + Tailwind (برای فرانت/asset pipeline؛ پروژه تمرکز اصلی‌اش API است)
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+## اجرای سریع (بدون Docker)
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+پیش‌نیاز: PHP 8.2، Composer، Node.js + npm
 
-## Laravel Sponsors
+```bash
+composer install
+cp .env.example .env
+php artisan key:generate
+php artisan migrate
+npm install
+npm run dev
+php artisan serve
+```
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+اگر می‌خواهید همه‌چیز را با یک دستور بالا بیاورید، اسکریپت `composer dev` هم وجود دارد:
 
-### Premium Partners
+```bash
+composer run dev
+```
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+## اجرای سریع (Docker)
 
-## Contributing
+پیش‌نیاز: Docker + Docker Compose
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+نکته: برای اجرا با Docker باید دیتابیس روی MySQL باشد (در `.env` تنظیم شده). اگر از `.env.example` کپی می‌کنید، مقدار `DB_CONNECTION` را به `mysql` تغییر دهید و `DB_HOST=db` را ست کنید.
 
-## Code of Conduct
+```bash
+make build
+make up
+make composer-install
+make key
+make fresh-db
+```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+- اپلیکیشن: `http://localhost:8080`
+- phpMyAdmin: `http://localhost:8081` (رمز `root`)
 
-## Security Vulnerabilities
+## مستندات API (Swagger)
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+- UI: `http://localhost:8080/api/documentation`
+- خروجی JSON: `public/api-docs/api-docs.json`
 
-## License
+در صورت نیاز به تولید مجدد:
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+```bash
+php artisan l5-swagger:generate
+```
+
+```bash
+make artisan-l5-swagger:generate    
+```
+
+## مسیرهای اصلی API
+
+پایهٔ همهٔ مسیرها: `/api`
+
+- Orders
+  - `POST /orders` ساخت سفارش `pending`
+  - `GET /orders/{order}` نمایش یک سفارش
+  - `POST /orders/{order}/pay` دریافت لینک پرداخت Mock
+  - `POST /orders/callback` callback بانک (موفق/ناموفق)
+- Reports
+  - `GET /financial-reports?start_date=YYYY-MM-DD&end_date=YYYY-MM-DD`
+  - `GET /financial-reports/chart?start_date=...&end_date=...&granularity=day|month`
+- Transactions
+  - `GET /transactions` (فیلترها: `wallet_id`, `order_id`, `type`, `flow`, `start_date`, `end_date`, `per_page`)
+  - `GET /transactions/{transaction}` نمایش یک تراکنش
+- Wallets
+  - `POST /wallets/withdraw` برداشت از کیف‌پول
+
+## صفحات UI (برای تست API)
+
+برای تست سریع endpointها یک UI ساده هم اضافه شده که درخواست‌ها را به صورت مستقیم به `/api/*` ارسال می‌کند.
+
+نکته: این پنل با کمک ابزارهای هوش مصنوعی (AI) توسعه یافته است.
+
+- صفحهٔ اصلی + منو: `GET /ui`
+- Orders:
+  - `GET /ui/orders/create` → `POST /api/orders`
+  - `GET /ui/orders/{order}` → اکشن‌های `POST /api/orders/{order}/pay` و `POST /api/orders/callback`
+- Transactions:
+  - `GET /ui/transactions` → `GET /api/transactions`
+  - `GET /ui/transactions/{transaction}` → `GET /api/transactions/{transaction}`
+- Reports:
+  - `GET /ui/reports/summary` → `GET /api/financial-reports`
+  - `GET /ui/reports/chart` → `GET /api/financial-reports/chart`
+- Wallets:
+  - `GET /ui/wallets/withdraw` → `POST /api/wallets/withdraw`
+
+## تنظیم درصدهای تقسیم مبلغ (Breakdown)
+
+محاسبهٔ سهم‌ها از طریق `App\\Services\\FinancialCalculatorService` انجام می‌شود و با env قابل تنظیم است:
+
+- `FIN_PLATFORM_COMMISSION_PERCENT` (پیش‌فرض: 15)
+- `FIN_POST_COST_PERCENT` (پیش‌فرض: 30)
+- `FIN_TEMPORARY_WALLET_PERCENT` (پیش‌فرض: 5)
+- `FIN_INSURANCE_PERCENT` (پیش‌فرض: 5)
+
+نکته: تمام مبالغ به‌صورت عدد صحیح (minor unit) و بدون اعشار مدیریت می‌شوند (`decimal:0`).
+
+## تست‌ها
+
+```bash
+composer test
+```
+
+در حالت Docker:
+
+```bash
+make test
+```
+
+## Makefile (Docker)
+
+برای ساده‌سازی کار با Docker یک `Makefile` هم در پروژه وجود دارد:
+
+- `make build` ساخت imageها (با `--pull`)
+- `make up` بالا آوردن سرویس‌ها (`docker compose up -d`)
+- `make down` خاموش کردن سرویس‌ها
+- `make restart` ری‌استارت با build
+- `make logs` نمایش لاگ‌ها
+- `make sh` ورود به کانتینر اپ
+- `make composer-install` اجرای `composer install` داخل کانتینر
+- `make key` اجرای `php artisan key:generate` داخل کانتینر
+- `make fresh-db` اجرای `php artisan migrate:fresh --seed` داخل کانتینر
+- `make test` اجرای تست‌ها داخل کانتینر
+
+اگر روی سیستم‌تان دستور `docker compose` موجود نیست، باید Docker Compose را نصب/فعال کنید.
+
+## پیشنهاد بهبود / Roadmap
+
+چند بهبود منطقی برای کامل‌تر شدن پروژه:
+
+- **سیستم احراز هویت**: اضافه کردن Auth برای API (مثلاً Laravel Sanctum) و محافظت از endpointها + رول/پرمیژن برای گزارش‌ها/عملیات کیف‌پول.
+- **اتصال به پروایدر بانکی واقعی**: تعریف abstraction برای Payment Provider (مثلاً `PaymentProviderInterface`) و پیاده‌سازی یک Adapter برای PSP واقعی (به‌همراه webhook verification, signature, idempotency, retry).
+- **ذخیره درصدها در دیتابیس + تاریخچه تغییرات**: انتقال تنظیمات breakdown از env به DB (مثلاً جدول `financial_settings`) و نگهداری history (audit trail) از تغییرات (timestamp, actor, old/new) تا گزارش‌ها قابل پیگیری باشند.
+- **پنل مدیریت**: یک UI/endpoint مدیریتی برای تغییر درصدها با validation (جمع درصدها ≤ 100) و مشاهده تاریخچه.
+  - نکته: این پنل مدیریت با کمک ابزارهای هوش مصنوعی (AI) توسعه یافته است.
+
+## لایسنس
+
+MIT
