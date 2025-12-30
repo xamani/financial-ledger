@@ -61,41 +61,21 @@ class FinancialCalculatorService
 
     private function percentOf(string $total, string $percent): string
     {
-        if (extension_loaded('bcmath')) {
-            return bcdiv(bcmul($total, $percent, 0), '100', 0);
-        }
-
-        $totalInt = (int) $total;
-        $percentInt = (int) $percent;
-
-        return (string) intdiv($totalInt * $percentInt, 100);
+        return bcdiv(bcmul($total, $percent, 0), '100', 0);
     }
 
     private function addMany(array $values): string
     {
-        if (extension_loaded('bcmath')) {
-            $sum = '0';
-            foreach ($values as $value) {
-                $sum = bcadd($sum, $value, 0);
-            }
-
-            return $sum;
-        }
-
-        $sum = 0;
+        $sum = '0';
         foreach ($values as $value) {
-            $sum += (int) $value;
+            $sum = bcadd($sum, $value, 0);
         }
 
-        return (string) $sum;
+        return $sum;
     }
 
     private function sub(string $left, string $right): string
     {
-        if (extension_loaded('bcmath')) {
-            return bcsub($left, $right, 0);
-        }
-
-        return (string) ((int) $left - (int) $right);
+        return bcsub($left, $right, 0);
     }
 }
