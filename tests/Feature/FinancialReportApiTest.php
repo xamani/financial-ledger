@@ -9,11 +9,25 @@ use App\Models\Transaction;
 use App\Models\User;
 use App\Models\Wallet;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Carbon;
 use Tests\TestCase;
 
 class FinancialReportApiTest extends TestCase
 {
     use RefreshDatabase;
+
+    private function createTransaction(array $attributes, string $createdAt): Transaction
+    {
+        $transaction = Transaction::query()->create($attributes);
+
+        $timestamp = Carbon::parse($createdAt);
+        $transaction->forceFill([
+            'created_at' => $timestamp,
+            'updated_at' => $timestamp,
+        ])->saveQuietly();
+
+        return $transaction;
+    }
 
     public function test_index_returns_aggregated_totals_and_by_type(): void
     {
@@ -31,38 +45,32 @@ class FinancialReportApiTest extends TestCase
             'balance' => '0',
         ]);
 
-        Transaction::query()->create([
+        $this->createTransaction([
             'wallet_id' => $wallet->id,
             'order_id' => $order->id,
             'type' => 'deposit',
             'amount' => '100',
             'flow' => 'in',
             'description' => null,
-            'created_at' => '2025-12-15 10:00:00',
-            'updated_at' => '2025-12-15 10:00:00',
-        ]);
+        ], '2025-12-15 10:00:00');
 
-        Transaction::query()->create([
+        $this->createTransaction([
             'wallet_id' => $wallet->id,
             'order_id' => $order->id,
             'type' => 'post_cost',
             'amount' => '60',
             'flow' => 'out',
             'description' => null,
-            'created_at' => '2025-12-16 10:00:00',
-            'updated_at' => '2025-12-16 10:00:00',
-        ]);
+        ], '2025-12-16 10:00:00');
 
-        Transaction::query()->create([
+        $this->createTransaction([
             'wallet_id' => $wallet->id,
             'order_id' => $order->id,
             'type' => 'deposit',
             'amount' => '999',
             'flow' => 'in',
             'description' => null,
-            'created_at' => '2026-02-01 10:00:00',
-            'updated_at' => '2026-02-01 10:00:00',
-        ]);
+        ], '2026-02-01 10:00:00');
 
         $response = $this->getJson('/api/financial-reports?start_date=2025-12-01&end_date=2026-01-01');
 
@@ -87,38 +95,32 @@ class FinancialReportApiTest extends TestCase
             'balance' => '0',
         ]);
 
-        Transaction::query()->create([
+        $this->createTransaction([
             'wallet_id' => $wallet->id,
             'order_id' => null,
             'type' => 'deposit',
             'amount' => '100',
             'flow' => 'in',
             'description' => null,
-            'created_at' => '2025-12-01 10:00:00',
-            'updated_at' => '2025-12-01 10:00:00',
-        ]);
+        ], '2025-12-01 10:00:00');
 
-        Transaction::query()->create([
+        $this->createTransaction([
             'wallet_id' => $wallet->id,
             'order_id' => null,
             'type' => 'deposit',
             'amount' => '40',
             'flow' => 'out',
             'description' => null,
-            'created_at' => '2025-12-01 12:00:00',
-            'updated_at' => '2025-12-01 12:00:00',
-        ]);
+        ], '2025-12-01 12:00:00');
 
-        Transaction::query()->create([
+        $this->createTransaction([
             'wallet_id' => $wallet->id,
             'order_id' => null,
             'type' => 'deposit',
             'amount' => '10',
             'flow' => 'in',
             'description' => null,
-            'created_at' => '2025-12-02 10:00:00',
-            'updated_at' => '2025-12-02 10:00:00',
-        ]);
+        ], '2025-12-02 10:00:00');
 
         $response = $this->getJson('/api/financial-reports/chart?start_date=2025-12-01&end_date=2025-12-02&granularity=day');
 
@@ -134,4 +136,3 @@ class FinancialReportApiTest extends TestCase
         $response->assertJsonPath('data.series.1.net', '10');
     }
 }
-

@@ -8,11 +8,25 @@ use App\Models\Transaction;
 use App\Models\User;
 use App\Models\Wallet;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Carbon;
 use Tests\TestCase;
 
 class TransactionApiTest extends TestCase
 {
     use RefreshDatabase;
+
+    private function createTransaction(array $attributes, string $createdAt): Transaction
+    {
+        $transaction = Transaction::query()->create($attributes);
+
+        $timestamp = Carbon::parse($createdAt);
+        $transaction->forceFill([
+            'created_at' => $timestamp,
+            'updated_at' => $timestamp,
+        ])->saveQuietly();
+
+        return $transaction;
+    }
 
     public function test_index_is_paginated_and_filterable(): void
     {
@@ -30,27 +44,23 @@ class TransactionApiTest extends TestCase
             'balance' => '0',
         ]);
 
-        Transaction::query()->create([
+        $this->createTransaction([
             'wallet_id' => $walletA->id,
             'order_id' => null,
             'type' => 'deposit',
             'amount' => '10',
             'flow' => 'in',
             'description' => null,
-            'created_at' => '2025-12-01 10:00:00',
-            'updated_at' => '2025-12-01 10:00:00',
-        ]);
+        ], '2025-12-01 10:00:00');
 
-        Transaction::query()->create([
+        $this->createTransaction([
             'wallet_id' => $walletB->id,
             'order_id' => null,
             'type' => 'platform_commission',
             'amount' => '2',
             'flow' => 'in',
             'description' => null,
-            'created_at' => '2025-12-01 11:00:00',
-            'updated_at' => '2025-12-01 11:00:00',
-        ]);
+        ], '2025-12-01 11:00:00');
 
         $response = $this->getJson('/api/transactions?per_page=1');
         $response->assertOk();
@@ -64,4 +74,3 @@ class TransactionApiTest extends TestCase
         $filtered->assertJsonPath('data.0.type', 'platform_commission');
     }
 }
-
