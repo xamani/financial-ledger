@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\OrderCallbackRequest;
+use App\Http\Requests\StoreOrderRequest;
 use App\Models\Order;
 use App\Models\Transaction;
 use App\Models\Wallet;
 use App\Services\FinancialCalculatorService;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Validation\Rule;
 
 class OrderController extends Controller
 {
@@ -35,12 +35,9 @@ class OrderController extends Controller
      *     @OA\Response(response=422, description="Validation error")
      * )
      */
-    public function store(Request $request): JsonResponse
+    public function store(StoreOrderRequest $request): JsonResponse
     {
-        $data = $request->validate([
-            'user_id' => ['required', 'integer', 'exists:users,id'],
-            'total_amount' => ['required', 'integer', 'min:1'],
-        ]);
+        $data = $request->validated();
 
         $order = Order::query()->create([
             'user_id' => $data['user_id'],
@@ -107,12 +104,9 @@ class OrderController extends Controller
      *     @OA\Response(response=422, description="Payment failed or validation error")
      * )
      */
-    public function callback(Request $request, FinancialCalculatorService $calculator): JsonResponse
+    public function callback(OrderCallbackRequest $request, FinancialCalculatorService $calculator): JsonResponse
     {
-        $data = $request->validate([
-            'order_id' => ['required', 'integer', 'exists:orders,id'],
-            'status' => ['required', Rule::in(['success', 'failed'])],
-        ]);
+        $data = $request->validated();
 
         return DB::transaction(function () use ($data, $calculator): JsonResponse {
             /** @var Order $order */

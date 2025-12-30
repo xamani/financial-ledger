@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\FinancialReportIndexRequest;
 use App\Models\Transaction;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 
 class FinancialReportController extends Controller
@@ -32,12 +32,9 @@ class FinancialReportController extends Controller
      *     @OA\Response(response=422, description="Validation error")
      * )
      */
-    public function index(Request $request): JsonResponse
+    public function index(FinancialReportIndexRequest $request): JsonResponse
     {
-        $data = $request->validate([
-            'start_date' => ['required', 'date'],
-            'end_date' => ['required', 'date', 'after_or_equal:start_date'],
-        ]);
+        $data = $request->validated();
 
         $start = Carbon::parse($data['start_date'])->startOfDay();
         $end = Carbon::parse($data['end_date'])->endOfDay();

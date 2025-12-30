@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\TransactionIndexRequest;
 use App\Models\Transaction;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 
 class TransactionController extends Controller
@@ -27,17 +27,9 @@ class TransactionController extends Controller
      *     @OA\Response(response=422, description="Validation error")
      * )
      */
-    public function index(Request $request): JsonResponse
+    public function index(TransactionIndexRequest $request): JsonResponse
     {
-        $data = $request->validate([
-            'wallet_id' => ['nullable', 'integer', 'exists:wallets,id'],
-            'order_id' => ['nullable', 'integer', 'exists:orders,id'],
-            'type' => ['nullable', 'string', 'max:255'],
-            'flow' => ['nullable', 'in:in,out'],
-            'start_date' => ['nullable', 'date'],
-            'end_date' => ['nullable', 'date', 'after_or_equal:start_date'],
-            'per_page' => ['nullable', 'integer', 'min:1', 'max:100'],
-        ]);
+        $data = $request->validated();
 
         $query = Transaction::query()
             ->with(['wallet', 'order'])
@@ -79,4 +71,3 @@ class TransactionController extends Controller
         ]);
     }
 }
-
