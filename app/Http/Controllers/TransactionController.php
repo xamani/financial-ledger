@@ -20,8 +20,8 @@ class TransactionController extends Controller
      *     @OA\Parameter(name="order_id", in="query", required=false, @OA\Schema(type="integer")),
      *     @OA\Parameter(name="type", in="query", required=false, @OA\Schema(type="string", example="platform_commission")),
      *     @OA\Parameter(name="flow", in="query", required=false, @OA\Schema(type="string", enum={"in","out"})),
-     *     @OA\Parameter(name="start_date", in="query", required=false, @OA\Schema(type="string", format="date", example="2025-01-01")),
-     *     @OA\Parameter(name="end_date", in="query", required=false, @OA\Schema(type="string", format="date", example="2025-01-31")),
+     *     @OA\Parameter(name="start_date", in="query", required=false, @OA\Schema(type="string", format="date", example="2025-12-01")),
+     *     @OA\Parameter(name="end_date", in="query", required=false, @OA\Schema(type="string", format="date", example="2026-01-01")),
      *     @OA\Parameter(name="per_page", in="query", required=false, @OA\Schema(type="integer", example=25)),
      *     @OA\Response(response=200, description="OK"),
      *     @OA\Response(response=422, description="Validation error")

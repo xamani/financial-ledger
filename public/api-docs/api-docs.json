@@ -27,7 +27,7 @@
                         "schema": {
                             "type": "string",
                             "format": "date",
-                            "example": "2025-01-01"
+                            "example": "2025-12-01"
                         }
                     },
                     {
@@ -37,7 +37,59 @@
                         "schema": {
                             "type": "string",
                             "format": "date",
-                            "example": "2025-01-31"
+                            "example": "2026-01-01"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                }
+            }
+        },
+        "/api/financial-reports/chart": {
+            "get": {
+                "tags": [
+                    "Reports"
+                ],
+                "summary": "Time-series chart data for income/expense in a date range",
+                "operationId": "f9505796943a48e568e85ad340a63f89",
+                "parameters": [
+                    {
+                        "name": "start_date",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "date",
+                            "example": "2025-12-01"
+                        }
+                    },
+                    {
+                        "name": "end_date",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "date",
+                            "example": "2026-01-01"
+                        }
+                    },
+                    {
+                        "name": "granularity",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "day",
+                                "month"
+                            ],
+                            "example": "day"
                         }
                     }
                 ],
@@ -219,7 +271,7 @@
                         "schema": {
                             "type": "string",
                             "format": "date",
-                            "example": "2025-01-01"
+                            "example": "2025-12-01"
                         }
                     },
                     {
@@ -229,7 +281,7 @@
                         "schema": {
                             "type": "string",
                             "format": "date",
-                            "example": "2025-01-31"
+                            "example": "2026-01-01"
                         }
                     },
                     {

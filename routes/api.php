@@ -10,5 +10,6 @@ Route::post('/orders/{order}/pay', [OrderController::class, 'pay'])->name('order
 Route::post('/orders/callback', [OrderController::class, 'callback'])->name('orders.callback');
 
 Route::get('/financial-reports', [FinancialReportController::class, 'index'])->name('financial-reports.index');
+Route::get('/financial-reports/chart', [FinancialReportController::class, 'chart'])->name('financial-reports.chart');
 
 Route::get('/transactions', [TransactionController::class, 'index'])->name('transactions.index');
